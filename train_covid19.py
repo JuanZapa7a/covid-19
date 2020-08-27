@@ -30,7 +30,7 @@ import pickle
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-d", "--dataset", default='../datasets/dataset',
+ap.add_argument("-d", "--dataset", default='../../PB/datasets/covid-dataset',
                 help="path to input dataset")
 ap.add_argument("-p", "--plot", type=str, default="output/covid.png",
                 help="path to output loss/accuracy plot")

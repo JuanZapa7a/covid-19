@@ -1,7 +1,5 @@
 # USAGE
-# python build_covid19_dataset.py --covid
-# ../datasets/covid-chestxray-dataset-master --output
-# ../datasets/dataset/covid
+# python build_covid19_dataset.py
 
 # import the necessary packages
 import pandas as pd
@@ -13,18 +11,19 @@ import os
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-k", "--kaggle", default = "../datasets/chest_xray",
-								help="path to base directory of Kaggle X-ray dataset")
-ap.add_argument("-s", "--sample", type=int, default=180,
-								help="# of samples to pull from Kaggle dataset")
-ap.add_argument("-c", "--covid", default="../datasets/covid-chestxray-dataset-master",
-	help="path to base directory for COVID-19 dataset")
-ap.add_argument("-o", "--output", default="../datasets/dataset",
-	help="path to directory where 'normal' and 'covid' images will be stored")
+ap.add_argument("-k", "--kaggle", default = "../../PB/datasets/chest_xray",
+                help = "path to base directory of Kaggle X-ray dataset")
+ap.add_argument("-s", "--sample", type = int, default = 180,
+                help = "# of samples to pull from Kaggle dataset")
+ap.add_argument("-c", "--covid",
+                default = "../../PB/datasets/covid-chestxray-dataset-master",
+                help = "path to base directory for COVID-19 dataset")
+ap.add_argument("-o", "--output", default = "../../PB/datasets/covid-dataset",
+                help = "path to directory where 'normal' and 'covid' images will be stored")
 args = vars(ap.parse_args())
 
 # grab all test,train and val image paths from the Kaggle X-ray dataset
-# chest_xray
+# ../../PB/datasets/chest_xray
 # ├── test
 # │		 ├── NORMAL [234 entries exceeds filelimit, not opening dir]
 # │		 └── PNEUMONIA [390 entries exceeds filelimit, not opening dir]
@@ -40,7 +39,9 @@ args = vars(ap.parse_args())
 testbasePath = os.path.sep.join([args["kaggle"], "test", "NORMAL"])
 trainbasePath = os.path.sep.join([args["kaggle"], "train", "NORMAL"])
 valbasePath = os.path.sep.join([args["kaggle"], "val", "NORMAL"])
-imagePaths = list(paths.list_images(testbasePath)) + list(paths.list_images(trainbasePath)) + list(paths.list_images(valbasePath))
+imagePaths = list(paths.list_images(testbasePath)) \
+             + list(paths.list_images(trainbasePath)) \
+             + list(paths.list_images(valbasePath))
 
 # randomly sample the image paths
 # I choose 25 first randomized images only NORMAL and PNEUMONIA and from
@@ -51,13 +52,13 @@ imagePaths = imagePaths[:args["sample"]]
 
 # loop over the image paths
 for (i, imagePath) in enumerate(imagePaths):
-	# extract the filename from imagePath and then construct the
-	# path to the copied "normal" image file
-	# copy the image from imagepath/filename to outpath/filename
-	shutil.copy2(imagePath, os.path.sep.join([args["output"],"normal"]))
+  # extract the filename from imagePath and then construct the
+  # path to the copied "normal" image file
+  # copy the image from imagepath/filename to outpath/filename
+  shutil.copy2(imagePath, os.path.sep.join([args["output"], "normal"]))
 
 # construct the path to the metadata CSV file and load it
-# covid-chestxray-dataset-master
+# # ../../PB/datasets/covid-chestxray-dataset-master
 # ├── docs
 # │ 	├── covid-xray-umap.png
 # │ 	└── share-image.png
@@ -70,8 +71,8 @@ df = pd.read_csv(csvPath)
 
 # loop over the rows of the COVID-19 data frame
 for (i, row) in df.iterrows():
-	# if (1) the current case is COVID-19 and (2) this is
-	# a 'PA' view, then it is stored
-	if row["finding"] == "COVID-19" and row["view"] == "PA":
-		shutil.copy2(os.path.sep.join([args["covid"], "images", row["filename"]]),
-								 os.path.sep.join([args["output"],"covid"]))
+  # if (1) the current case is COVID-19 and (2) this is
+  # a 'PA' view, then it is stored
+  if row["finding"] == "COVID-19" and row["view"] == "PA":
+    shutil.copy2(os.path.sep.join([args["covid"], "images", row["filename"]]),
+                 os.path.sep.join([args["output"], "covid"]))
